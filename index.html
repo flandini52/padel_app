@@ -87,8 +87,12 @@ li { display:flex; justify-content:space-between; padding:6px; }
 
 <script>
 
-let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
+let teams = JSON.parse(localStorage.getItem("padel_teams"));
 
+if (!teams || teams.length !== 4) {
+  document.getElementById("matches").innerHTML =
+    "<p>⚠️ Nessun torneo trovato. Vai prima su Sorteggio.</p>";
+}
 let matches = [
   [0,1],
   [2,3],
@@ -104,9 +108,14 @@ function render() {
 
   matches.forEach((m, i) => {
 
+    let teamA = teams[m[0]];
+    let teamB = teams[m[1]];
+
+    if (!teamA || !teamB) return;
+
     html += `
       <div class="match">
-        <b>${teams[m[0]].name} vs ${teams[m[1]].name}</b><br>
+        <b>${teamA.name} vs ${teamB.name}</b><br>
 
         <input id="a${i}" placeholder="A">
         <input id="b${i}" placeholder="B">
@@ -150,8 +159,9 @@ function calc() {
     ).join("");
 }
 
-render();
-
+if (teams && teams.length === 4) {
+  render();
+}
 </script>
 
 </body>
