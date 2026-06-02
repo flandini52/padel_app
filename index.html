@@ -33,13 +33,6 @@
     margin-bottom: 12px;
   }
 
-  textarea {
-    width: 100%;
-    height: 80px;
-    border-radius: 10px;
-    padding: 10px;
-  }
-
   button {
     width: 100%;
     padding: 12px;
@@ -50,12 +43,6 @@
     background: #22c55e;
   }
 
-  .match {
-    display: flex;
-    justify-content: space-between;
-    margin: 8px 0;
-  }
-
   input {
     width: 50px;
     text-align: center;
@@ -63,14 +50,23 @@
     border: none;
   }
 
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    border-bottom: 1px solid #334155;
+  }
+
   .badge {
     background: #334155;
     padding: 4px 8px;
     border-radius: 999px;
   }
-
-  ul { padding: 0; list-style: none; }
-  li { display:flex; justify-content:space-between; padding:6px; }
 </style>
 </head>
 
@@ -80,21 +76,13 @@
 
 <div class="container">
 
-  <!-- PLAYERS -->
   <div class="card">
-    <h3>👥 Giocatori</h3>
-    <textarea id="players" placeholder="Mario, Luca, Paolo, Marco..."></textarea>
-    <button onclick="generateTeams()">🎲 Sorteggia coppie</button>
-  </div>
-
-  <!-- MATCHES -->
-  <div class="card">
-    <h3>🎾 Tabellone</h3>
+    <h3>🎾 Match</h3>
     <div id="matches"></div>
+
     <button onclick="calc()">📊 Aggiorna classifica</button>
   </div>
 
-  <!-- CLASSIFICA -->
   <div class="card">
     <h3>📊 Classifica</h3>
     <ul id="standings"></ul>
@@ -104,44 +92,8 @@
 
 <script>
 
-let matchData = [];
+let matchData = JSON.parse(localStorage.getItem("padel_teams") || "[]");
 
-function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
-}
-
-// 🎲 GENERA COPPIE E MATCH
-function generateTeams() {
-
-  let players = document.getElementById("players").value
-    .split(",")
-    .map(p => p.trim())
-    .filter(Boolean);
-
-  if (players.length < 4) {
-    alert("Servono almeno 4 giocatori");
-    return;
-  }
-
-  let shuffled = shuffle(players);
-
-  matchData = [];
-
-  for (let i = 0; i < shuffled.length; i += 4) {
-    let team1 = [shuffled[i], shuffled[i+1]];
-    let team2 = [shuffled[i+2], shuffled[i+3]];
-
-    matchData.push({
-      a: team1,
-      b: team2,
-      id: i
-    });
-  }
-
-  renderMatches();
-}
-
-// 🧱 CREA TABELLONE
 function renderMatches() {
 
   let html = "";
@@ -149,12 +101,10 @@ function renderMatches() {
   matchData.forEach((m, idx) => {
 
     html += `
-      <div style="margin-bottom:10px">
-        <div class="match">
-          <span>${m.a.join(" & ")} vs ${m.b.join(" & ")}</span>
-        </div>
+      <div style="margin-bottom:12px">
+        <div><b>${m.teamA.join(" & ")} vs ${m.teamB.join(" & ")}</b></div>
 
-        <div class="match">
+        <div style="display:flex; gap:10px; margin-top:5px;">
           <input id="a${idx}" placeholder="A">
           <input id="b${idx}" placeholder="B">
         </div>
@@ -165,37 +115,36 @@ function renderMatches() {
   document.getElementById("matches").innerHTML = html;
 }
 
-// 📊 CLASSIFICA (2 punti vittoria, 0 sconfitta)
+// 🧠 2 punti vittoria, 0 sconfitta
 function calc() {
 
   let points = {};
 
   matchData.forEach((m, idx) => {
 
-    let aScore = parseInt(document.getElementById("a"+idx).value) || 0;
-    let bScore = parseInt(document.getElementById("b"+idx).value) || 0;
+    let a = parseInt(document.getElementById("a"+idx).value) || 0;
+    let b = parseInt(document.getElementById("b"+idx).value) || 0;
 
-    let teamA = m.a;
-    let teamB = m.b;
+    m.teamA.forEach(p => points[p] = points[p] || 0);
+    m.teamB.forEach(p => points[p] = points[p] || 0);
 
-    teamA.forEach(p => points[p] = points[p] || 0);
-    teamB.forEach(p => points[p] = points[p] || 0);
-
-    if (aScore > bScore) {
-      teamA.forEach(p => points[p] += 2);
-    } else if (bScore > aScore) {
-      teamB.forEach(p => points[p] += 2);
+    if (a > b) {
+      m.teamA.forEach(p => points[p] += 2);
+    } else if (b > a) {
+      m.teamB.forEach(p => points[p] += 2);
     }
   });
 
   let sorted = Object.entries(points)
-    .sort((a,b) => b[1] - a[1]);
+    .sort((a,b) => b[1]-a[1]);
 
   document.getElementById("standings").innerHTML =
     sorted.map(p =>
       `<li><span>${p[0]}</span><span class="badge">${p[1]} pt</span></li>`
     ).join("");
 }
+
+renderMatches();
 
 </script>
 
