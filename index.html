@@ -53,6 +53,11 @@ button {
   border: none;
   border-radius: 10px;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #334155;
 }
 
 ul {
@@ -80,6 +85,11 @@ li {
 
 <div class="container">
 
+  <!-- NAV -->
+  <div class="card">
+    <button onclick="goDraw()">🎲 Vai al sorteggio</button>
+  </div>
+
   <div class="card">
     <h3>🎾 Match</h3>
     <div id="matches"></div>
@@ -96,14 +106,11 @@ li {
 
 <script>
 
-let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
-
-if (!teams || teams.length !== 4) {
-  document.getElementById("matches").innerHTML =
-    "<p>⚠️ Nessun torneo trovato. Vai prima su Sorteggio.</p>";
-} else {
-  render();
+function goDraw() {
+  window.location.href = "draw.html";
 }
+
+let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
 
 let matches = [
   [0,1],
@@ -114,18 +121,26 @@ let matches = [
   [1,2]
 ];
 
+// 🚨 render solo se valido
+if (!teams || teams.length !== 4) {
+  document.getElementById("matches").innerHTML =
+    "<p>⚠️ Nessun torneo trovato. Vai al sorteggio.</p>";
+} else {
+  render();
+}
+
 function render() {
 
   let html = "";
 
   matches.forEach((m, i) => {
 
-    const teamA = teams[m[0]];
-    const teamB = teams[m[1]];
+    const a = teams[m[0]];
+    const b = teams[m[1]];
 
     html += `
       <div class="match">
-        <b>${teamA.name} vs ${teamB.name}</b><br>
+        <b>${a.name} vs ${b.name}</b><br>
 
         <input id="a${i}" placeholder="A">
         <input id="b${i}" placeholder="B">
@@ -139,13 +154,24 @@ function render() {
 function calc() {
 
   let points = {};
+  let playedMatches = 0;
 
   teams.forEach(t => points[t.name] = 0);
 
   matches.forEach((m, i) => {
 
-    let a = parseInt(document.getElementById("a"+i).value) || 0;
-    let b = parseInt(document.getElementById("b"+i).value) || 0;
+    let aVal = document.getElementById("a"+i).value;
+    let bVal = document.getElementById("b"+i).value;
+
+    // ❌ IGNORA MATCH NON GIOCATO
+    if (aVal === "" || bVal === "") return;
+
+    let a = parseInt(aVal);
+    let b = parseInt(bVal);
+
+    if (isNaN(a) || isNaN(b)) return;
+
+    playedMatches++;
 
     const tA = teams[m[0]].name;
     const tB = teams[m[1]].name;
@@ -159,6 +185,11 @@ function calc() {
       points[tB] += 1;
     }
   });
+
+  if (playedMatches === 0) {
+    alert("Inserisci almeno un risultato");
+    return;
+  }
 
   let sorted = Object.entries(points)
     .sort((a,b) => b[1]-a[1]);
