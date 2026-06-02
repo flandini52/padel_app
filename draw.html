@@ -10,8 +10,8 @@ body {
   font-family: Arial;
   background: #0f172a;
   color: white;
-  margin: 0;
   text-align: center;
+  margin: 0;
 }
 
 header {
@@ -36,8 +36,8 @@ header {
 textarea, input {
   width: 90%;
   padding: 10px;
-  border-radius: 10px;
   margin-top: 8px;
+  border-radius: 10px;
   border: none;
 }
 
@@ -49,12 +49,6 @@ button {
   border-radius: 10px;
   background: #22c55e;
   font-weight: bold;
-  cursor: pointer;
-}
-
-.small {
-  font-size: 12px;
-  opacity: 0.7;
 }
 </style>
 </head>
@@ -69,7 +63,7 @@ button {
     <h3>Inserisci 8 giocatori</h3>
     <textarea id="players" placeholder="Mario, Luca, Paolo, Marco, Anna, Sara, Gio, Ale"></textarea>
 
-    <button onclick="generate()">🎲 Genera squadre</button>
+    <button onclick="generate()">Genera squadre</button>
   </div>
 
   <div class="card" id="result"></div>
@@ -92,7 +86,7 @@ function generate() {
     .filter(Boolean);
 
   if (players.length !== 8) {
-    alert("Devi inserire ESATTAMENTE 8 giocatori");
+    alert("Devi inserire esattamente 8 giocatori");
     return;
   }
 
@@ -117,7 +111,7 @@ function generate() {
     `;
   });
 
-  html += `<button onclick="save()">💾 Conferma e vai al torneo</button>`;
+  html += `<button onclick="save()">💾 Salva e vai al torneo</button>`;
 
   document.getElementById("result").innerHTML = html;
 }
@@ -125,8 +119,8 @@ function generate() {
 function save() {
 
   teams.forEach((t, i) => {
-    let val = document.getElementById("t"+i).value;
-    t.name = val || `Team ${i+1}`;
+    const input = document.getElementById("t"+i);
+    if (input) t.name = input.value;
   });
 
   localStorage.setItem("padel_teams", JSON.stringify(teams));

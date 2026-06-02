@@ -34,7 +34,7 @@ header {
 }
 
 .match {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 input {
@@ -55,13 +55,21 @@ button {
   font-weight: bold;
 }
 
-ul { list-style:none; padding:0; }
-li { display:flex; justify-content:space-between; padding:6px; }
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+}
 
 .badge {
-  background:#334155;
-  padding:4px 8px;
-  border-radius:999px;
+  background: #334155;
+  padding: 4px 8px;
+  border-radius: 999px;
 }
 </style>
 </head>
@@ -75,6 +83,7 @@ li { display:flex; justify-content:space-between; padding:6px; }
   <div class="card">
     <h3>🎾 Match</h3>
     <div id="matches"></div>
+
     <button onclick="calc()">📊 Aggiorna classifica</button>
   </div>
 
@@ -87,21 +96,14 @@ li { display:flex; justify-content:space-between; padding:6px; }
 
 <script>
 
+let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
 
-let teams = [];
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  teams = JSON.parse(localStorage.getItem("padel_teams") || "null");
-
-  if (!teams || teams.length !== 4) {
-    document.getElementById("matches").innerHTML =
-      "<p>⚠️ Nessun torneo trovato. Vai prima su Sorteggio.</p>";
-    return;
-  }
-
+if (!teams || teams.length !== 4) {
+  document.getElementById("matches").innerHTML =
+    "<p>⚠️ Nessun torneo trovato. Vai prima su Sorteggio.</p>";
+} else {
   render();
-});
+}
 
 let matches = [
   [0,1],
@@ -118,8 +120,8 @@ function render() {
 
   matches.forEach((m, i) => {
 
-    let teamA = teams[m[0]];
-    let teamB = teams[m[1]];
+    const teamA = teams[m[0]];
+    const teamB = teams[m[1]];
 
     html += `
       <div class="match">
@@ -145,8 +147,8 @@ function calc() {
     let a = parseInt(document.getElementById("a"+i).value) || 0;
     let b = parseInt(document.getElementById("b"+i).value) || 0;
 
-    let tA = teams[m[0]].name;
-    let tB = teams[m[1]].name;
+    const tA = teams[m[0]].name;
+    const tB = teams[m[1]].name;
 
     if (a > b) {
       points[tA] += 2;
