@@ -1,3 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Torneo Padel</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
+
+header {
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(90deg,#22c55e,#06b6d4);
+  font-weight: bold;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 12px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.match {
+  margin-bottom: 10px;
+}
+
+input {
+  width: 60px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+  margin-left: 5px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #22c55e;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+ul { list-style:none; padding:0; }
+li { display:flex; justify-content:space-between; padding:6px; }
+
+.badge {
+  background:#334155;
+  padding:4px 8px;
+  border-radius:999px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🏆 Torneo Padel</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>🎾 Match</h3>
+    <div id="matches"></div>
+    <button onclick="calc()">📊 Aggiorna classifica</button>
+  </div>
+
+  <div class="card">
+    <h3>📊 Classifica</h3>
+    <ul id="standings"></ul>
+  </div>
+
+</div>
+
+<script>
 <script>
 
 let teams = [];
@@ -80,3 +168,6 @@ function calc() {
 }
 
 </script>
+
+</body>
+</html>
