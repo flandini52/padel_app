@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Padel App</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Arial;
+    background: #0f172a;
+    color: white;
+  }
+
+  header {
+    padding: 18px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(90deg,#22c55e,#06b6d4);
+  }
+
+  .container {
+    padding: 12px;
+    max-width: 500px;
+    margin: auto;
+  }
+
+  .card {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .match {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+  }
+
+  .team {
+    font-weight: bold;
+    width: 60px;
+  }
+
+  input {
+    width: 60px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+    background: #22c55e;
+    color: black;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  .table {
+    list-style: none;
+    padding: 0;
+  }
+
+  .table li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+  }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #334155;
+  }
+</style>
+</head>
+
+<body>
+
+<header>🏆 Padel Tournament</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>🎾 Match</h3>
+
+    <div class="match">A vs B
+      <input id="a1"><input id="b1">
+    </div>
+
+    <div class="match">C vs D
+      <input id="c1"><input id="d1">
+    </div>
+
+    <div class="match">A vs C
+      <input id="a2"><input id="c2">
+    </div>
+
+    <div class="match">B vs D
+      <input id="b2"><input id="d2">
+    </div>
+
+    <div class="match">A vs D
+      <input id="a3"><input id="d3">
+    </div>
+
+    <div class="match">B vs C
+      <input id="b3"><input id="c3">
+    </div>
+
+    <button onclick="calc()">Aggiorna Classifica</button>
+    <button onclick="resetAll()" style="background:#ef4444;color:white;">Reset</button>
+  </div>
+
+  <div class="card">
+    <h3>📊 Classifica</h3>
+    <ul id="standings" class="table"></ul>
+  </div>
+
+</div>
+
+<script>
+
+function save() {
+  let inputs = document.querySelectorAll("input");
+  let data = {};
+  inputs.forEach(i => data[i.id] = i.value);
+  localStorage.setItem("padel", JSON.stringify(data));
+}
+
+function load() {
+  let data = JSON.parse(localStorage.getItem("padel") || "{}");
+  for (let k in data) {
+    let el = document.getElementById(k);
+    if (el) el.value = data[k];
+  }
+}
+
+function calc() {
+
+  save();
+
+  let teams = {A:0,B:0,C:0,D:0};
+
+  let matches = [
+    ["A","B","a1","b1"],
+    ["C","D","c1","d1"],
+    ["A","C","a2","c2"],
+    ["B","D","b2","d2"],
+    ["A","D","a3","d3"],
+    ["B","C","b3","c3"]
+  ];
+
+  matches.forEach(m => {
+    let aT=m[0], bT=m[1];
+    let a=parseInt(document.getElementById(m[2]).value)||0;
+    let b=parseInt(document.getElementById(m[3]).value)||0;
+
+    if(a>b) teams[aT]+=3;
+    else if(b>a) teams[bT]+=3;
+    else { teams[aT]+=1; teams[bT]+=1; }
+  });
+
+  let sorted = Object.entries(teams).sort((a,b)=>b[1]-a[1]);
+
+  document.getElementById("standings").innerHTML =
+    sorted.map(t =>
+      `<li><span>${t[0]}</span><span class="badge">${t[1]} pt</span></li>`
+    ).join("");
+}
+
+function resetAll() {
+  localStorage.removeItem("padel");
+  document.querySelectorAll("input").forEach(i => i.value = "");
+  document.getElementById("standings").innerHTML = "";
+}
+
+load();
+calc();
+
+</script>
+
+</body>
+</html>
