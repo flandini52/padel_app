@@ -1,85 +1,80 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Padel Tournament</title>
+<title>Torneo Padel</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-  }
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+}
 
-  header {
-    padding: 16px;
-    text-align: center;
-    font-weight: bold;
-    background: linear-gradient(90deg,#22c55e,#06b6d4);
-  }
+header {
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(90deg,#22c55e,#06b6d4);
+  font-weight: bold;
+}
 
-  .container {
-    max-width: 500px;
-    margin: auto;
-    padding: 12px;
-  }
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 12px;
+}
 
-  .card {
-    background: #1e293b;
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 12px;
-  }
+.card {
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
 
-  button {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    margin-top: 10px;
-    font-weight: bold;
-    background: #22c55e;
-  }
+.match {
+  margin-bottom: 10px;
+}
 
-  input {
-    width: 50px;
-    text-align: center;
-    border-radius: 8px;
-    border: none;
-  }
+input {
+  width: 60px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+  margin-left: 5px;
+}
 
-  ul {
-    list-style: none;
-    padding: 0;
-  }
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #22c55e;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+}
 
-  li {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px;
-    border-bottom: 1px solid #334155;
-  }
+ul { list-style:none; padding:0; }
+li { display:flex; justify-content:space-between; padding:6px; }
 
-  .badge {
-    background: #334155;
-    padding: 4px 8px;
-    border-radius: 999px;
-  }
+.badge {
+  background:#334155;
+  padding:4px 8px;
+  border-radius:999px;
+}
 </style>
 </head>
 
 <body>
 
-<header>🏆 Padel Tournament</header>
+<header>🏆 Torneo Padel</header>
 
 <div class="container">
 
   <div class="card">
     <h3>🎾 Match</h3>
     <div id="matches"></div>
-
     <button onclick="calc()">📊 Aggiorna classifica</button>
   </div>
 
@@ -92,22 +87,29 @@
 
 <script>
 
-let matchData = JSON.parse(localStorage.getItem("padel_teams") || "[]");
+let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
 
-function renderMatches() {
+let matches = [
+  [0,1],
+  [2,3],
+  [0,2],
+  [1,3],
+  [0,3],
+  [1,2]
+];
+
+function render() {
 
   let html = "";
 
-  matchData.forEach((m, idx) => {
+  matches.forEach((m, i) => {
 
     html += `
-      <div style="margin-bottom:12px">
-        <div><b>${m.teamA.join(" & ")} vs ${m.teamB.join(" & ")}</b></div>
+      <div class="match">
+        <b>${teams[m[0]].name} vs ${teams[m[1]].name}</b><br>
 
-        <div style="display:flex; gap:10px; margin-top:5px;">
-          <input id="a${idx}" placeholder="A">
-          <input id="b${idx}" placeholder="B">
-        </div>
+        <input id="a${i}" placeholder="A">
+        <input id="b${i}" placeholder="B">
       </div>
     `;
   });
@@ -115,23 +117,27 @@ function renderMatches() {
   document.getElementById("matches").innerHTML = html;
 }
 
-// 🧠 2 punti vittoria, 0 sconfitta
 function calc() {
 
   let points = {};
 
-  matchData.forEach((m, idx) => {
+  teams.forEach(t => points[t.name] = 0);
 
-    let a = parseInt(document.getElementById("a"+idx).value) || 0;
-    let b = parseInt(document.getElementById("b"+idx).value) || 0;
+  matches.forEach((m, i) => {
 
-    m.teamA.forEach(p => points[p] = points[p] || 0);
-    m.teamB.forEach(p => points[p] = points[p] || 0);
+    let a = parseInt(document.getElementById("a"+i).value) || 0;
+    let b = parseInt(document.getElementById("b"+i).value) || 0;
+
+    let tA = teams[m[0]].name;
+    let tB = teams[m[1]].name;
 
     if (a > b) {
-      m.teamA.forEach(p => points[p] += 2);
+      points[tA] += 2;
     } else if (b > a) {
-      m.teamB.forEach(p => points[p] += 2);
+      points[tB] += 2;
+    } else {
+      points[tA] += 1;
+      points[tB] += 1;
     }
   });
 
@@ -139,12 +145,12 @@ function calc() {
     .sort((a,b) => b[1]-a[1]);
 
   document.getElementById("standings").innerHTML =
-    sorted.map(p =>
-      `<li><span>${p[0]}</span><span class="badge">${p[1]} pt</span></li>`
+    sorted.map(t =>
+      `<li><span>${t[0]}</span><span class="badge">${t[1]} pt</span></li>`
     ).join("");
 }
 
-renderMatches();
+render();
 
 </script>
 

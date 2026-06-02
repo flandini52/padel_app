@@ -6,54 +6,58 @@
 <title>Sorteggio Padel</title>
 
 <style>
-  body {
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    text-align: center;
-  }
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
+}
 
-  .card {
-    background: #1e293b;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 12px;
-    max-width: 420px;
-  }
+.card {
+  background: #1e293b;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 12px;
+}
 
-  textarea {
-    width: 90%;
-    height: 100px;
-    padding: 10px;
-    border-radius: 10px;
-  }
+textarea, input {
+  width: 90%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+}
 
-  button {
-    padding: 12px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 10px;
-    background: #22c55e;
-    font-weight: bold;
-    width: 90%;
-  }
+button {
+  width: 90%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  font-weight: bold;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🎲 Sorteggio Padel</h2>
+<h2>🎲 Sorteggio Torneo Padel</h2>
 
 <div class="card">
-  <textarea id="players" placeholder="Mario, Luca, Paolo, Marco..."></textarea>
-  <button onclick="draw()">Estrai coppie</button>
+  <textarea id="players" placeholder="Inserisci 8 nomi separati da virgola"></textarea>
+  <button onclick="draw()">Genera squadre</button>
 </div>
 
 <div class="card" id="result"></div>
 
 <script>
 
-let tempTeams = [];
+let teams = [];
+
+function shuffle(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
 
 function draw() {
 
@@ -62,38 +66,45 @@ function draw() {
     .map(p => p.trim())
     .filter(Boolean);
 
-  if (players.length < 4) {
-    alert("Servono almeno 4 giocatori");
+  if (players.length !== 8) {
+    alert("Devi inserire esattamente 8 giocatori");
     return;
   }
 
-  players.sort(() => Math.random() - 0.5);
+  players = shuffle(players);
 
-  tempTeams = [];
+  teams = [
+    { players: [players[0], players[1]], name: "Team 1" },
+    { players: [players[2], players[3]], name: "Team 2" },
+    { players: [players[4], players[5]], name: "Team 3" },
+    { players: [players[6], players[7]], name: "Team 4" }
+  ];
 
-  let html = "";
+  let html = "<h3>Squadre generate</h3>";
 
-  for (let i = 0; i < players.length; i += 4) {
-
-    let teamA = [players[i], players[i+1]];
-    let teamB = [players[i+2], players[i+3]];
-
-    tempTeams.push({ teamA, teamB });
-
+  teams.forEach((t, i) => {
     html += `
-      <div style="margin-bottom:10px">
-        <b>${teamA.join(" & ")} vs ${teamB.join(" & ")}</b>
+      <div>
+        <b>${t.players.join(" & ")}</b><br>
+        Nome squadra:
+        <input id="t${i}" value="${t.name}">
       </div>
+      <br>
     `;
-  }
+  });
 
-  html += `<button onclick="saveTeams()">💾 Salva e vai al torneo</button>`;
+  html += `<button onclick="save()">💾 Conferma e vai al torneo</button>`;
 
   document.getElementById("result").innerHTML = html;
 }
 
-function saveTeams() {
-  localStorage.setItem("padel_teams", JSON.stringify(tempTeams));
+function save() {
+
+  teams.forEach((t, i) => {
+    t.name = document.getElementById("t"+i).value || `Team ${i+1}`;
+  });
+
+  localStorage.setItem("padel_teams", JSON.stringify(teams));
   window.location.href = "index.html";
 }
 
