@@ -48,7 +48,6 @@ button {
   background: #334155;
 }
 
-/* match */
 .match {
   margin-bottom: 12px;
 }
@@ -77,6 +76,44 @@ li {
   padding:4px 8px;
   border-radius:999px;
 }
+
+/* 🏆 WINNER ANIMATION */
+#winnerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#winnerBox {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  animation: pop 0.4s ease forwards;
+}
+
+#winnerBox h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+#winnerBox p {
+  font-size: 18px;
+  margin-top: 10px;
+  color: #22c55e;
+}
+
+@keyframes pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 </style>
 </head>
 
@@ -86,12 +123,10 @@ li {
 
 <div class="container">
 
-  <!-- HOME / MENU -->
+  <!-- MENU -->
   <div class="card" id="home">
     <h3>🎮 Menu</h3>
-
     <button onclick="goDraw()">🎲 Crea nuovo torneo</button>
-
     <button class="secondary" onclick="loadTournament()">📊 Continua torneo</button>
   </div>
 
@@ -104,11 +139,26 @@ li {
     <button class="secondary" onclick="reset()">🔄 Nuovo torneo</button>
   </div>
 
+  <!-- FINALS -->
+  <div class="card" id="finalsBox" style="display:none;">
+    <h3>🏆 Finali</h3>
+    <div id="finals"></div>
+  </div>
+
+  <!-- CLASSIFICA -->
   <div class="card" id="standingsBox" style="display:none;">
     <h3>📊 Classifica</h3>
     <ul id="standings"></ul>
   </div>
 
+</div>
+
+<!-- WINNER OVERLAY -->
+<div id="winnerOverlay">
+  <div id="winnerBox">
+    <h1>🏆 WINNER</h1>
+    <p id="winnerName"></p>
+  </div>
 </div>
 
 <script>
@@ -170,10 +220,17 @@ function render() {
   document.getElementById("matches").innerHTML = html;
 }
 
+function allPlayed() {
+  return matches.every((_, i) => {
+    let a = document.getElementById("a"+i).value;
+    let b = document.getElementById("b"+i).value;
+    return a !== "" && b !== "";
+  });
+}
+
 function calc() {
 
   let points = {};
-
   teams.forEach(t => points[t.name] = 0);
 
   matches.forEach((m, i) => {
@@ -203,6 +260,73 @@ function calc() {
     sorted.map(t =>
       `<li><span>${t[0]}</span><span class="badge">${t[1]} pt</span></li>`
     ).join("");
+
+  if (allPlayed()) {
+    generateFinals(sorted);
+  }
+}
+
+function generateFinals(sorted) {
+
+  let a = sorted[0][0];
+  let b = sorted[1][0];
+  let c = sorted[2][0];
+  let d = sorted[3][0];
+
+  document.getElementById("finalsBox").style.display = "block";
+
+  document.getElementById("finals").innerHTML = `
+    <h4>🥇 Finale 1° - 2°</h4>
+    ${a} vs ${b}<br>
+    <input id="f1a"> <input id="f1b">
+
+    <h4 style="margin-top:15px;">🥉 Finale 3° - 4°</h4>
+    ${c} vs ${d}<br>
+    <input id="f2a"> <input id="f2b">
+
+    <button onclick="calcFinals('${a}','${b}','${c}','${d}')">
+      🏆 Chiudi torneo
+    </button>
+  `;
+}
+
+function calcFinals(a,b,c,d) {
+
+  let f1a = parseInt(document.getElementById("f1a").value);
+  let f1b = parseInt(document.getElementById("f1b").value);
+
+  let f2a = parseInt(document.getElementById("f2a").value);
+  let f2b = parseInt(document.getElementById("f2b").value);
+
+  let first, second, third, fourth;
+
+  if (f1a > f1b) {
+    first = a;
+    second = b;
+  } else {
+    first = b;
+    second = a;
+  }
+
+  if (f2a > f2b) {
+    third = c;
+    fourth = d;
+  } else {
+    third = d;
+    fourth = c;
+  }
+
+  showWinner(first);
+}
+
+function showWinner(name) {
+
+  document.getElementById("winnerName").innerText = name;
+  document.getElementById("winnerOverlay").style.display = "flex";
+
+  setTimeout(() => {
+    document.getElementById("winnerOverlay").style.display = "none";
+  }, 3000);
 }
 
 </script>
