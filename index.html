@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Torneo Padel</title>
+<title>Padel App</title>
 
 <style>
 body {
@@ -33,6 +33,22 @@ header {
   margin-bottom: 12px;
 }
 
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  background: #22c55e;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #334155;
+}
+
+/* match */
 .match {
   margin-bottom: 12px;
 }
@@ -45,59 +61,50 @@ input {
   margin-left: 5px;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #22c55e;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.secondary {
-  background: #334155;
-}
-
 ul {
   list-style: none;
   padding: 0;
 }
 
 li {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
+  display:flex;
+  justify-content:space-between;
+  padding:6px;
 }
 
 .badge {
-  background: #334155;
-  padding: 4px 8px;
-  border-radius: 999px;
+  background:#334155;
+  padding:4px 8px;
+  border-radius:999px;
 }
 </style>
 </head>
 
 <body>
 
-<header>🏆 Torneo Padel</header>
+<header>🏆 Padel App</header>
 
 <div class="container">
 
-  <!-- NAV -->
-  <div class="card">
-    <button onclick="goDraw()">🎲 Vai al sorteggio</button>
+  <!-- HOME / MENU -->
+  <div class="card" id="home">
+    <h3>🎮 Menu</h3>
+
+    <button onclick="goDraw()">🎲 Crea nuovo torneo</button>
+
+    <button class="secondary" onclick="loadTournament()">📊 Continua torneo</button>
   </div>
 
-  <div class="card">
+  <!-- TOURNAMENT -->
+  <div class="card" id="tournament" style="display:none;">
     <h3>🎾 Match</h3>
     <div id="matches"></div>
 
     <button onclick="calc()">📊 Aggiorna classifica</button>
+    <button class="secondary" onclick="reset()">🔄 Nuovo torneo</button>
   </div>
 
-  <div class="card">
+  <div class="card" id="standingsBox" style="display:none;">
     <h3>📊 Classifica</h3>
     <ul id="standings"></ul>
   </div>
@@ -108,6 +115,11 @@ li {
 
 function goDraw() {
   window.location.href = "draw.html";
+}
+
+function reset() {
+  localStorage.removeItem("padel_teams");
+  location.reload();
 }
 
 let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
@@ -121,11 +133,19 @@ let matches = [
   [1,2]
 ];
 
-// 🚨 render solo se valido
-if (!teams || teams.length !== 4) {
-  document.getElementById("matches").innerHTML =
-    "<p>⚠️ Nessun torneo trovato. Vai al sorteggio.</p>";
-} else {
+function loadTournament() {
+
+  teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
+
+  if (!teams || teams.length !== 4) {
+    alert("Nessun torneo trovato");
+    return;
+  }
+
+  document.getElementById("home").style.display = "none";
+  document.getElementById("tournament").style.display = "block";
+  document.getElementById("standingsBox").style.display = "block";
+
   render();
 }
 
@@ -141,7 +161,6 @@ function render() {
     html += `
       <div class="match">
         <b>${a.name} vs ${b.name}</b><br>
-
         <input id="a${i}" placeholder="A">
         <input id="b${i}" placeholder="B">
       </div>
@@ -154,7 +173,6 @@ function render() {
 function calc() {
 
   let points = {};
-  let playedMatches = 0;
 
   teams.forEach(t => points[t.name] = 0);
 
@@ -163,33 +181,20 @@ function calc() {
     let aVal = document.getElementById("a"+i).value;
     let bVal = document.getElementById("b"+i).value;
 
-    // ❌ IGNORA MATCH NON GIOCATO
     if (aVal === "" || bVal === "") return;
 
     let a = parseInt(aVal);
     let b = parseInt(bVal);
 
-    if (isNaN(a) || isNaN(b)) return;
-
-    playedMatches++;
-
-    const tA = teams[m[0]].name;
-    const tB = teams[m[1]].name;
-
     if (a > b) {
-      points[tA] += 2;
+      points[teams[m[0]].name] += 2;
     } else if (b > a) {
-      points[tB] += 2;
+      points[teams[m[1]].name] += 2;
     } else {
-      points[tA] += 1;
-      points[tB] += 1;
+      points[teams[m[0]].name] += 1;
+      points[teams[m[1]].name] += 1;
     }
   });
-
-  if (playedMatches === 0) {
-    alert("Inserisci almeno un risultato");
-    return;
-  }
 
   let sorted = Object.entries(points)
     .sort((a,b) => b[1]-a[1]);
