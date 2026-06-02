@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sorteggio Padel</title>
+
+<style>
+body { font-family: Arial; background:#0f172a; color:white; text-align:center; }
+textarea { width:90%; height:100px; border-radius:10px; padding:10px; }
+button { padding:12px; margin-top:10px; border:none; border-radius:10px; background:#22c55e; font-weight:bold; }
+.card { background:#1e293b; margin:20px auto; padding:15px; border-radius:12px; max-width:400px; }
+</style>
+</head>
+
+<body>
+
+<h2>🎾 Sorteggio Padel</h2>
+
+<div class="card">
+  <p>Inserisci nomi separati da virgola</p>
+  <textarea id="players"></textarea>
+  <button onclick="drawPairs()">Estrai coppie</button>
+</div>
+
+<div class="card" id="result"></div>
+
+<script>
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function drawPairs() {
+  let players = document.getElementById("players").value
+    .split(",")
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  if (players.length < 4) {
+    document.getElementById("result").innerHTML = "Servono almeno 4 giocatori";
+    return;
+  }
+
+  let shuffled = shuffle(players);
+
+  let pairs = [];
+  for (let i = 0; i < shuffled.length; i += 2) {
+    pairs.push([shuffled[i], shuffled[i+1]]);
+  }
+
+  document.getElementById("result").innerHTML =
+    pairs.map(p => `<div>🏸 ${p[0]} + ${p[1]}</div>`).join("");
+}
+</script>
+
+</body>
+</html>

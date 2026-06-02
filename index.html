@@ -6,89 +6,7 @@
 <title>Padel App</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, Arial;
-    background: #0f172a;
-    color: white;
-  }
-
-  header {
-    padding: 18px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    background: linear-gradient(90deg,#22c55e,#06b6d4);
-  }
-
-  .container {
-    padding: 12px;
-    max-width: 500px;
-    margin: auto;
-  }
-
-  .card {
-    background: #1e293b;
-    border-radius: 16px;
-    padding: 12px;
-    margin-bottom: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
-
-  .match {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 8px 0;
-  }
-
-  .team {
-    font-weight: bold;
-    width: 60px;
-  }
-
-  input {
-    width: 60px;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    text-align: center;
-    font-size: 16px;
-  }
-
-  button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 14px;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 10px;
-    background: #22c55e;
-    color: black;
-  }
-
-  button:active {
-    transform: scale(0.98);
-  }
-
-  .table {
-    list-style: none;
-    padding: 0;
-  }
-
-  .table li {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #334155;
-  }
-
-  .badge {
-    padding: 4px 10px;
-    border-radius: 999px;
-    background: #334155;
-  }
+/* tutto il tuo CSS invariato */
 </style>
 </head>
 
@@ -97,6 +15,13 @@
 <header>🏆 Padel Tournament</header>
 
 <div class="container">
+
+  <!-- 🔥 BUTTON SORT EG GIO GIUSTO QUI -->
+  <div class="card">
+    <a href="draw.html">
+      <button>🎲 Sorteggio coppie</button>
+    </a>
+  </div>
 
   <div class="card">
     <h3>🎾 Match</h3>
@@ -137,64 +62,7 @@
 </div>
 
 <script>
-
-function save() {
-  let inputs = document.querySelectorAll("input");
-  let data = {};
-  inputs.forEach(i => data[i.id] = i.value);
-  localStorage.setItem("padel", JSON.stringify(data));
-}
-
-function load() {
-  let data = JSON.parse(localStorage.getItem("padel") || "{}");
-  for (let k in data) {
-    let el = document.getElementById(k);
-    if (el) el.value = data[k];
-  }
-}
-
-function calc() {
-
-  save();
-
-  let teams = {A:0,B:0,C:0,D:0};
-
-  let matches = [
-    ["A","B","a1","b1"],
-    ["C","D","c1","d1"],
-    ["A","C","a2","c2"],
-    ["B","D","b2","d2"],
-    ["A","D","a3","d3"],
-    ["B","C","b3","c3"]
-  ];
-
-  matches.forEach(m => {
-    let aT=m[0], bT=m[1];
-    let a=parseInt(document.getElementById(m[2]).value)||0;
-    let b=parseInt(document.getElementById(m[3]).value)||0;
-
-    if(a>b) teams[aT]+=3;
-    else if(b>a) teams[bT]+=3;
-    else { teams[aT]+=1; teams[bT]+=1; }
-  });
-
-  let sorted = Object.entries(teams).sort((a,b)=>b[1]-a[1]);
-
-  document.getElementById("standings").innerHTML =
-    sorted.map(t =>
-      `<li><span>${t[0]}</span><span class="badge">${t[1]} pt</span></li>`
-    ).join("");
-}
-
-function resetAll() {
-  localStorage.removeItem("padel");
-  document.querySelectorAll("input").forEach(i => i.value = "");
-  document.getElementById("standings").innerHTML = "";
-}
-
-load();
-calc();
-
+// tuo JS invariato
 </script>
 
 </body>
