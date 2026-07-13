@@ -169,12 +169,13 @@ function goDraw() {
 
 function reset() {
   localStorage.removeItem("padel_teams");
+  localStorage.removeItem("padel_double_round");
   location.reload();
 }
 
 let teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
 
-let matches = [
+const baseMatches = [
   [0,1],
   [2,3],
   [0,2],
@@ -183,14 +184,22 @@ let matches = [
   [1,2]
 ];
 
+let matches = baseMatches;
+let doubleRound = false;
+
 function loadTournament() {
 
   teams = JSON.parse(localStorage.getItem("padel_teams") || "[]");
+  doubleRound = JSON.parse(localStorage.getItem("padel_double_round") || "false");
 
   if (!teams || teams.length !== 4) {
     alert("Nessun torneo trovato");
     return;
   }
+
+  matches = doubleRound
+    ? baseMatches.concat(baseMatches.map(m => [m[1], m[0]]))
+    : baseMatches;
 
   document.getElementById("home").style.display = "none";
   document.getElementById("tournament").style.display = "block";
@@ -207,9 +216,13 @@ function render() {
 
     const a = teams[m[0]];
     const b = teams[m[1]];
+    const leg = doubleRound
+      ? (i < baseMatches.length ? "🔹 Andata" : "🔸 Ritorno")
+      : "";
 
     html += `
       <div class="match">
+        ${leg ? `<small>${leg}</small><br>` : ""}
         <b>${a.name} vs ${b.name}</b><br>
         <input id="a${i}" placeholder="A">
         <input id="b${i}" placeholder="B">

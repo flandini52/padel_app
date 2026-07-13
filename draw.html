@@ -63,6 +63,13 @@ button {
     <h3>Inserisci 8 giocatori</h3>
     <textarea id="players" placeholder="Mario, Luca, Paolo, Marco, Anna, Sara, Gio, Ale"></textarea>
 
+    <div style="text-align:left; margin-top:10px;">
+      <label>
+        <input type="checkbox" id="doubleRound">
+        🔁 Torneo all'italiana con andata e ritorno
+      </label>
+    </div>
+
     <button onclick="generate()">Genera squadre</button>
   </div>
 
@@ -123,7 +130,10 @@ function save() {
     if (input) t.name = input.value;
   });
 
+  const doubleRound = document.getElementById("doubleRound").checked;
+
   localStorage.setItem("padel_teams", JSON.stringify(teams));
+  localStorage.setItem("padel_double_round", JSON.stringify(doubleRound));
 
   window.location.href = "index.html";
 }
